@@ -7,7 +7,7 @@ def fetch_google_doc_content(url: str) -> Optional[str]:
     """
     Fetch content from a published Google Doc and extract text
     """
-    print("🔍 Fetching Google Doc content...")
+    print(" Fetching Google Doc content...")
     print(f"URL: {url}")
     print("-" * 50)
     
@@ -16,12 +16,12 @@ def fetch_google_doc_content(url: str) -> Optional[str]:
         response.raise_for_status()
         content = response.text
         
-        print("✅ Document fetched successfully!")
-        print(f"📊 Content length: {len(content):,} characters")
+        print("Document fetched successfully!")
+        print(f"Content length: {len(content):,} characters")
         
         # Extract text from HTML
         if content.strip().startswith('<!DOCTYPE html>') or '<html>' in content[:200]:
-            print("🔍 Extracting text from HTML...")
+            print("Extracting text from HTML...")
             
             # Remove script and style tags
             clean_html = re.sub(r'<script[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)
@@ -34,18 +34,18 @@ def fetch_google_doc_content(url: str) -> Optional[str]:
             clean_text = re.sub(r'\s+', ' ', text_content)
             clean_text = clean_text.strip()
             
-            print(f"📝 Extracted text length: {len(clean_text):,} characters")
-            print(f"🔍 First 500 characters:")
+            print(f"Extracted text length: {len(clean_text):,} characters")
+            print(f"First 500 characters:")
             print(repr(clean_text[:500]))
             
             return clean_text
         else:
-            print(f"🔍 First 500 characters:")
+            print(f"First 500 characters:")
             print(repr(content[:500]))
             return content
             
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error fetching document: {e}")
+        print(f" Error fetching document: {e}")
         return None
 
 
@@ -53,7 +53,7 @@ def parse_coordinates(content: str) -> List[Tuple[int, str, int]]:
     """
     Parse coordinate data from the content
     """
-    print("🔄 Parsing coordinate data...")
+    print("Parsing coordinate data...")
     print("-" * 50)
     
     coordinates = []
@@ -61,11 +61,11 @@ def parse_coordinates(content: str) -> List[Tuple[int, str, int]]:
     # The content shows concatenated format like: "0█00█10█21▀11▀22▀12▀23▀2"
     # We need to find patterns like: digit+character+digit
     
-    print(f"📝 Content length: {len(content)} characters")
-    print(f"🔍 Looking for coordinate patterns in: {repr(content[-100:])}")
+    print(f" Content length: {len(content)} characters")
+    print(f" Looking for coordinate patterns in: {repr(content[-100:])}")
     
     # Method 1: Look for digit+character+digit patterns
-    print(f"\n🔍 Method 1: Looking for digit+character+digit patterns...")
+    print(f"\n Method 1: Looking for digit+character+digit patterns...")
     
     # Find the coordinate data section (after "y-coordinate")
     coord_start = content.find("y-coordinate")
@@ -75,14 +75,14 @@ def parse_coordinates(content: str) -> List[Tuple[int, str, int]]:
     if coord_start != -1:
         # Get the part after the headers
         coord_data = content[coord_start + 12:]  # Skip "y-coordinate"
-        print(f"📍 Found coordinate section: {repr(coord_data[:50])}...")
+        print(f"Found coordinate section: {repr(coord_data[:50])}...")
         
         # Look for patterns: single_digit + special_character + single_digit
         # Use non-greedy matching and specify single digits
         pattern = r'(\d)([^\d\s])(\d)'
         matches = re.findall(pattern, coord_data)
         
-        print(f"🔍 Found {len(matches)} potential coordinate matches")
+        print(f" Found {len(matches)} potential coordinate matches")
         
         for match in matches:
             x_str, char, y_str = match
@@ -91,13 +91,13 @@ def parse_coordinates(content: str) -> List[Tuple[int, str, int]]:
                 # Only accept special characters (not letters)
                 if not char.isalpha():
                     coordinates.append((x, char, y))
-                    print(f"✅ Found coordinate: ({x}, '{char}', {y})")
+                    print(f" Found coordinate: ({x}, '{char}', {y})")
             except ValueError:
                 continue
     
     # Method 2: Look for specific block characters
     if not coordinates:
-        print(f"\n🔍 Method 2: Looking for block characters...")
+        print(f"\n Method 2: Looking for block characters...")
         block_chars = ['█', '▀', '▄', '■', '▌', '▐', '●', '○', '◆', '◇', '★', '☆']
         
         for char in block_chars:
@@ -143,7 +143,7 @@ def parse_coordinates(content: str) -> List[Tuple[int, str, int]]:
     
     # Method 3: Manual parsing of the specific pattern we see
     if not coordinates:
-        print(f"\n🔍 Method 3: Manual parsing of concatenated format...")
+        print(f"\n Method 3: Manual parsing of concatenated format...")
         
         # Look for the pattern at the end: "0█00█10█21▀11▀22▀12▀23▀2"
         # We need to split this carefully
